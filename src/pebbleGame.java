@@ -1,5 +1,20 @@
 import java.util.Scanner;
 public class pebbleGame {
+    public class player{
+        public void draw(){
+            try{
+                return;
+            }catch (RuntimeException e){
+            }
+        }
+
+        public void deposit(){
+            try{
+                return;
+            }catch (RuntimeException e){
+            }
+        }
+    }
     public static void main(String[] args){
         System.out.println("Welcome to the PebbleGame!!");
         System.out.println("You will be asked to enter the number of players");
