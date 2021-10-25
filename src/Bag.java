@@ -4,11 +4,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Bag {
 
-    private String title;
-    private ArrayList<Integer> contents= new ArrayList<Integer>();
-    private AtomicInteger sizeOfBag = new AtomicInteger(contents.size());
+    private final String title;
+    private ArrayList<Integer> contents = new ArrayList<Integer>();
+    private final AtomicInteger sizeOfBag = new AtomicInteger(contents.size());
     private States bagState;
-
 
     // This is a method lol
     public ArrayList<Integer> getContents() {
@@ -29,10 +28,13 @@ public class Bag {
 
     public void readFile(String filename){
         try {
-            Scanner reader = new Scanner(new File(filename));
+            System.out.println("Entered the try block");
+            Scanner reader = new Scanner(f);
+            System.out.println("Got past the new scanner");
             reader.useDelimiter(",");
             while (reader.hasNext()) {
                 //adds to contents
+                //contents.add(Integer.parseInt(reader.next()));
             }
             reader.close();
         }catch (Exception e){
