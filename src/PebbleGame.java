@@ -59,7 +59,9 @@ public class PebbleGame {
                 if(fileInput.equals('E')|| fileInput.equals('e')){
                     System.exit(0);
                 }else{
-                    blackBags[i].readFile(fileName);
+                    if(blackBags[i].readFile(fileName)){
+                        break;
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Scanner;
 
 public class Bag {
 
@@ -26,19 +27,21 @@ public class Bag {
         this.bagState = bagState;
     }
 
-    public void readFile(String filename){
+    public boolean readFile(String filename){
         try {
-            System.out.println("Entered the try block");
-            Scanner reader = new Scanner(f);
-            System.out.println("Got past the new scanner");
+            Scanner reader = new Scanner(new File(filename));
+            System.out.print("I have read the file\n");
             reader.useDelimiter(",");
             while (reader.hasNext()) {
-                //adds to contents
-                //contents.add(Integer.parseInt(reader.next()));
+                System.out.println(reader.next());
+                contents.add(Integer.parseInt(reader.next()));
             }
             reader.close();
+            return true;
         }catch (Exception e){
+            System.out.println("File not found");
         }
+        return false;
     }
 
     public enum States{
