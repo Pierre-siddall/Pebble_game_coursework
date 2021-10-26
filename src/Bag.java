@@ -1,7 +1,7 @@
 import java.io.File;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Bag {
 
@@ -9,6 +9,10 @@ public class Bag {
     private ArrayList<Integer> contents = new ArrayList<Integer>();
     private final AtomicInteger sizeOfBag = new AtomicInteger(contents.size());
     private States bagState;
+
+    public int getContentLength() {
+        return getContents().size();
+    }
 
     // This is a method lol
     public ArrayList<Integer> getContents() {
@@ -27,19 +31,20 @@ public class Bag {
         this.bagState = bagState;
     }
 
-    public boolean readFile(String filename){
+    public Boolean readFile(String filename) {
         try {
             Scanner reader = new Scanner(new File(filename));
-            System.out.print("I have read the file\n");
             reader.useDelimiter(",");
             while (reader.hasNext()) {
-                System.out.println(reader.next());
-                contents.add(Integer.parseInt(reader.next()));
+                //System.out.println(reader.next());
+                contents.add(Integer.parseInt(reader.next().trim()));
             }
             reader.close();
             return true;
-        }catch (Exception e){
-            System.out.println("File not found");
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+
         }
         return false;
     }
