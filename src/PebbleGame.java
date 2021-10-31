@@ -51,6 +51,7 @@ public class PebbleGame {
         Bag[] whiteBags = {new Bag("WB1"), new Bag("WB2"), new Bag("WB3")};
         int playerNo = 0;
         // TODO check if the "black bag contains at least 11 times as many pebbles as players"
+
         showWelcomeMessage();
         checkPlayerInput(playerNo, p);
         generateBags(blackBags);
@@ -58,6 +59,8 @@ public class PebbleGame {
 
     public class Player implements Runnable {
         private final String playerName;
+        private final int handSize = 0;
+        private final ArrayList<Integer> hand = new ArrayList<Integer>();
 
         public Player(String playerName) {
             this.playerName = playerName;
@@ -67,9 +70,17 @@ public class PebbleGame {
             return playerName;
         }
 
-        public void draw(Bag chosenBag) {
+        public synchronized void draw(Bag[] bagArray) {
             try {
-                return;
+                // TODO - check if bag is empty
+                //Chooses a random black bag
+                Random aRand = new Random();
+                int index = aRand.nextInt(3);
+                Bag b = bagArray[index];
+                //Chooses a random pebble from selected bag
+                Random bRand = new Random();
+                int pebbleIndex = bRand.nextInt(b.getContentLength());
+                hand.add(b.getContents().get(pebbleIndex));
             } catch (RuntimeException e) {
             }
         }

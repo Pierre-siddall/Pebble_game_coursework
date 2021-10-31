@@ -48,7 +48,6 @@ public class Bag {
         }
         return false;
     }
-
     public enum States{
         FULL,EMPTY
     }
