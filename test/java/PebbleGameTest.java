@@ -9,8 +9,8 @@ public class PebbleGameTest {
         Bag[] blackBags = {new Bag("BB1"), new Bag("BB2"), new Bag("BB3")};
         PebbleGame.generateBags(blackBags, 3);
         assertEquals(blackBags[0].getContentLength(), 100);
-        assertEquals(blackBags[1], 100);
-        assertEquals(blackBags[2], 100);
+        assertEquals(blackBags[1].getContentLength(), 100);
+        assertEquals(blackBags[2].getContentLength(), 100);
     }
 
     @Test

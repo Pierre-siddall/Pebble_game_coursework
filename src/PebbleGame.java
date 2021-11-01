@@ -27,7 +27,7 @@ public class PebbleGame {
     public static void showWelcomeMessage() {
         System.out.println("Welcome to the PebbleGame!!");
         System.out.println("You will be asked to enter the number of players");
-        System.out.print("and then for the location of three files in turn containing comma seperated \n integer values for the pebble weights \n");
+        System.out.print("and then for the location of three files in turn containing comma seperated \n integer values for the Pebble weights \n");
         System.out.println("The integer values must be strictly positive.");
         System.out.println("The game will then be simulate, and output written to files in this director");
     }
@@ -50,7 +50,6 @@ public class PebbleGame {
         Bag[] blackBags = {new Bag("BB1"), new Bag("BB2"), new Bag("BB3")};
         Bag[] whiteBags = {new Bag("WB1"), new Bag("WB2"), new Bag("WB3")};
         int playerNo = 0;
-        // TODO check if the "black bag contains at least 11 times as many pebbles as players"
 
         showWelcomeMessage();
         checkPlayerInput(playerNo, p);
@@ -77,7 +76,7 @@ public class PebbleGame {
                 Random aRand = new Random();
                 int index = aRand.nextInt(3);
                 Bag b = bagArray[index];
-                //Chooses a random pebble from selected bag
+                //Chooses a random Pebble from selected bag
                 Random bRand = new Random();
                 int pebbleIndex = bRand.nextInt(b.getContentLength());
                 hand.add(b.getContents().get(pebbleIndex));
@@ -85,9 +84,23 @@ public class PebbleGame {
             }
         }
 
-        public void deposit() {
+        public synchronized void deposit(Bag[] bagArray) {
             try {
-                return;
+                if (hand.size() <= 0) {
+                } else {
+                    Random hRand = new Random();
+                    int hIndex = hRand.nextInt();
+
+                    if (hand.get(hIndex).getDrawBag().equals("A")) {
+                        bagArray[0].getContents().add(hand.remove(hIndex));
+
+                    } else if (hand.get(hIndex).getDrawBag().equals("B")) {
+                        bagArray[1].getContents().add(hand.remove(hIndex));
+
+                    } else if (hand.get(hIndex).getDrawBag().equals("C")) {
+                        bagArray[3].getContents().add(hand.remove(hIndex));
+                    }
+                }
             } catch (RuntimeException e) {
             }
         }

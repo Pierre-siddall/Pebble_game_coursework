@@ -6,20 +6,24 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Bag {
 
     private final String title;
-    private ArrayList<Integer> contents = new ArrayList<Integer>();
+    private ArrayList<Pebble> contents = new ArrayList<Pebble>();
     private final AtomicInteger sizeOfBag = new AtomicInteger(contents.size());
     private States bagState;
+
+    public String getTitle() {
+        return title;
+    }
 
     public int getContentLength() {
         return getContents().size();
     }
 
     // This is a method lol
-    public ArrayList<Integer> getContents() {
+    public ArrayList<Pebble> getContents() {
         return contents;
     }
 
-    public void setContents(ArrayList<Integer> contents) {
+    public void setContents(ArrayList<Pebble> contents) {
         this.contents = contents;
     }
 
@@ -37,7 +41,7 @@ public class Bag {
             reader.useDelimiter(",");
             while (reader.hasNext()) {
                 //System.out.println(reader.next());
-                contents.add(Integer.parseInt(reader.next().trim()));
+                contents.add(new Pebble(Integer.parseInt(reader.next().trim()), getTitle()));
             }
             reader.close();
             return true;
