@@ -3,6 +3,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class PebbleGame {
+    Bag[] blackBags = {new Bag("A"), new Bag("B"), new Bag("C")};
+    Bag[] whiteBags = {new Bag("X"), new Bag("Y"), new Bag("Z")};
 
 
     public static void generateBags(Bag[] blackBags) {
@@ -69,6 +71,12 @@ public class PebbleGame {
             return playerName;
         }
 
+        public synchronized void initialHand(Bag[] bagArray) {
+            for (int i = 0; i < 10; i++) {
+                draw(bagArray);
+            }
+        }
+
         public synchronized void draw(Bag[] bagArray) {
             try {
                 // TODO - check if bag is empty
@@ -80,6 +88,7 @@ public class PebbleGame {
                 Random bRand = new Random();
                 int pebbleIndex = bRand.nextInt(b.getContentLength());
                 hand.add(b.getContents().get(pebbleIndex));
+                checkHand();
             } catch (RuntimeException e) {
             }
         }
@@ -105,9 +114,27 @@ public class PebbleGame {
             }
         }
 
+        public void checkHand() {
+            int sum = 0;
+            for (int i = 0; i < getHandSize(); i++) {
+                sum += hand.get(i).getValue();
+                if (sum == 100) {
+                    //All other players are flagged that a player has won
+                    // any other game ending features are run after the players are notified
+                }
+            }
+        }
+
+        public int getHandSize() {
+            return handSize;
+        }
+
         @Override
         public void run() {
-
+            while (true) {
+                draw(blackBags);
+                deposit(whiteBags);
+            }
         }
     }
 }
