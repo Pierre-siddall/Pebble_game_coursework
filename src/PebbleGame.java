@@ -79,7 +79,6 @@ public class PebbleGame {
 
         public synchronized void draw(Bag[] bagArray) {
             try {
-                // TODO - check if bag is empty
                 //Chooses a random black bag
                 Random aRand = new Random();
                 int index = aRand.nextInt(3);
@@ -87,6 +86,8 @@ public class PebbleGame {
                 //Chooses a random Pebble from selected bag
                 Random bRand = new Random();
                 int pebbleIndex = bRand.nextInt(b.getContentLength());
+                //TODO- Get the whiteBags array and pass it to the function
+                checkEmptyBag(b);
                 hand.add(b.getContents().get(pebbleIndex));
                 checkHand();
             } catch (RuntimeException e) {
@@ -122,6 +123,20 @@ public class PebbleGame {
                     //All other players are flagged that a player has won
                     // any other game ending features are run after the players are notified
                 }
+            }
+        }
+
+        public void checkEmptyBag(Bag bag, Bag[] bagArray) {
+            try {
+                if (bag.getContents().size() == 0 && bag.getTitle().equals("A")) {
+                    bag.setContents(bagArray[0].getContents());
+                } else if (bag.getContents().size() == 0 && bag.getTitle().equals("B")) {
+                    bag.setContents(bagArray[1].getContents());
+                } else if (bag.getContents().size() == 0 && bag.getTitle().equals("C")) {
+                    bag.setContents(bagArray[2].getContents());
+                }
+            } catch (RuntimeException e) {
+                e.printStackTrace();
             }
         }
 
