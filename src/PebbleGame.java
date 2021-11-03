@@ -3,8 +3,9 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 public class PebbleGame {
-    Bag[] blackBags = {new Bag("A"), new Bag("B"), new Bag("C")};
-    Bag[] whiteBags = {new Bag("X"), new Bag("Y"), new Bag("Z")};
+
+    private final Bag[] blackBags = {new Bag("A"), new Bag("B"), new Bag("C")};
+    private final Bag[] whiteBags = {new Bag("X"), new Bag("Y"), new Bag("Z")};
 
 
     public static void generateBags(Bag[] blackBags) {
@@ -77,29 +78,25 @@ public class PebbleGame {
             }
         }
 
-        public synchronized void draw(Bag[] bagArray) {
-            try {
-                //Chooses a random black bag
-                Random aRand = new Random();
-                int index = aRand.nextInt(3);
-                Bag b = bagArray[index];
-                //Chooses a random Pebble from selected bag
-                Random bRand = new Random();
-                int pebbleIndex = bRand.nextInt(b.getContentLength());
-                //TODO- Get the whiteBags array and pass it to the function
-                checkEmptyBag(b);
-                hand.add(b.getContents().get(pebbleIndex));
-                checkHand();
-            } catch (RuntimeException e) {
-            }
+        public synchronized void draw(Bag[] bagArray) throws RuntimeException {
+            //Chooses a random black bag
+            Random aRand = new Random();
+            int index = aRand.nextInt(3);
+            Bag b = bagArray[index];
+            //Chooses a random Pebble from selected bag
+            Random bRand = new Random();
+            int pebbleIndex = bRand.nextInt(b.getContentLength());
+            checkEmptyBag(b, whiteBags);
+            hand.add(b.getContents().get(pebbleIndex));
+            checkHand();
         }
 
-        public synchronized void deposit(Bag[] bagArray) {
-            try {
-                if (hand.size() <= 0) {
-                } else {
-                    Random hRand = new Random();
-                    int hIndex = hRand.nextInt();
+        public synchronized void deposit(Bag[] bagArray) throws RuntimeException {
+            if (hand.size() <= 0) {
+
+            } else {
+                Random hRand = new Random();
+                int hIndex = hRand.nextInt();
 
                     if (hand.get(hIndex).getDrawBag().equals("A")) {
                         bagArray[0].getContents().add(hand.remove(hIndex));
@@ -115,7 +112,7 @@ public class PebbleGame {
             }
         }
 
-        public void checkHand() {
+        public synchronized void checkHand() {
             int sum = 0;
             for (int i = 0; i < getHandSize(); i++) {
                 sum += hand.get(i).getValue();
