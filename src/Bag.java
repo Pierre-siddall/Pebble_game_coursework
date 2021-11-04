@@ -1,13 +1,11 @@
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class Bag {
 
     private final String title;
     private ArrayList<Pebble> contents = new ArrayList<Pebble>();
-    private final AtomicInteger sizeOfBag = new AtomicInteger(contents.size());
     private States bagState;
 
     public String getTitle() {
@@ -15,7 +13,7 @@ public class Bag {
     }
 
     public int getContentLength() {
-        return getContents().size();
+        return contents.size();
     }
 
     // This is a method lol
@@ -40,7 +38,6 @@ public class Bag {
             Scanner reader = new Scanner(new File(filename));
             reader.useDelimiter(",");
             while (reader.hasNext()) {
-                //System.out.println(reader.next());
                 contents.add(new Pebble(Integer.parseInt(reader.next().trim()), getTitle()));
             }
             reader.close();
@@ -52,11 +49,21 @@ public class Bag {
         }
         return false;
     }
-    public enum States{
-        FULL,EMPTY
+
+    public enum States {
+        FULL, EMPTY
+    }
+
+    @Override
+    public String toString() {
+        return "Bag{" +
+                "title='" + title + '\'' +
+                ", contents=" + contents +
+                ", bagState=" + bagState +
+                '}';
     }
 
     public Bag(String title) {
-        this.title=title;
+        this.title = title;
     }
 }

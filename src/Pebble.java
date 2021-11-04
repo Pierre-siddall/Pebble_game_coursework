@@ -14,4 +14,12 @@ public class Pebble {
     public String getDrawBag() {
         return drawBag;
     }
+
+    @Override
+    public String toString() {
+        return "Pebble{" +
+                "value=" + value +
+                ", drawBag='" + drawBag + '\'' +
+                '}';
+    }
 }

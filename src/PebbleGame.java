@@ -1,14 +1,14 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 public class PebbleGame {
+    private static final Bag[] whiteBags = {new Bag("X"), new Bag("Y"), new Bag("Z")};
+    private static Bag[] blackBags = {new Bag("A"), new Bag("B"), new Bag("C")};
+    public boolean winner = false;
 
-    private final Bag[] blackBags = {new Bag("A"), new Bag("B"), new Bag("C")};
-    private final Bag[] whiteBags = {new Bag("X"), new Bag("Y"), new Bag("Z")};
-
-
-    public static void generateBags(Bag[] blackBags) {
+    public static void generateBags(Bag[] blackBags, int playerNo) {
         for (int i = 0; i < 3; i++) {
             String fileName = "";
             File f = new File(fileName);
@@ -25,6 +25,32 @@ public class PebbleGame {
                 }
             }
         }
+
+        checkBagSize(blackBags, playerNo);
+    }
+
+    public static void checkPlayerInput(int playerNo, ArrayList<Thread> p) {
+        Scanner playerInput = new Scanner(System.in);
+
+        // Check if user has inputted negative numbers
+        while (playerNo <= 0) {
+            System.out.println("Please enter the number of players ");
+            playerNo = playerInput.nextInt();
+        }
+        for (int i = 0; i < playerNo; i++) {
+            Thread player = new Thread(new PebbleGame().new Player("p" + i));
+            p.add(player);
+        }
+    }
+
+    public static void checkBagSize(Bag[] blackBags, int playerNo) {
+        int total = 0;
+        for (Bag b : blackBags) {
+            total = b.getContentLength();
+            if (total < playerNo * 11) {
+                generateBags(blackBags, playerNo);
+            }
+        }
     }
 
     public static void showWelcomeMessage() {
@@ -35,34 +61,50 @@ public class PebbleGame {
         System.out.println("The game will then be simulate, and output written to files in this director");
     }
 
-    public static void checkPlayerInput(int playerNo, ArrayList<Player> p) {
-        Scanner playerInput = new Scanner(System.in);
-
-        // Check if user has inputted negative numbers
-        while (playerNo <= 0) {
-            System.out.println("Please enter the number of players ");
-            playerNo = playerInput.nextInt();
-        }
-        for (int i = 0; i < playerNo; i++) {
-            Player player = new PebbleGame().new Player("p" + i);
-            p.add(player);
-        }
+    public static void main(String[] args) {
+        PebbleGame pg = new PebbleGame();
+        pg.playGame();
     }
 
-    public static void main(String[] args) {
-        Bag[] blackBags = {new Bag("BB1"), new Bag("BB2"), new Bag("BB3")};
-        Bag[] whiteBags = {new Bag("WB1"), new Bag("WB2"), new Bag("WB3")};
+    public Bag[] getBlackBags() {
+        return blackBags;
+    }
+
+    public void setBlackBags(Bag[] blackBags) {
+        PebbleGame.blackBags = blackBags;
+    }
+
+    public void playGame() {
+        ArrayList<Thread> p = new ArrayList<Thread>();
+
         int playerNo = 0;
 
         showWelcomeMessage();
         checkPlayerInput(playerNo, p);
-        generateBags(blackBags);
+        generateBags(blackBags, playerNo);
+        Thread umpire = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (!winner) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+        umpire.start();
+        for (int i = 0; i < p.size(); i++) {
+            p.get(i).start();
+        }
     }
 
     public class Player implements Runnable {
         private final String playerName;
         private final int handSize = 0;
-        private final ArrayList<Integer> hand = new ArrayList<Integer>();
+        private final ArrayList<Pebble> hand = new ArrayList<Pebble>();
+        public boolean won = false;
 
         public Player(String playerName) {
             this.playerName = playerName;
@@ -81,8 +123,8 @@ public class PebbleGame {
         public synchronized void draw(Bag[] bagArray) throws RuntimeException {
             //Chooses a random black bag
             Random aRand = new Random();
-            int index = aRand.nextInt(3);
-            Bag b = bagArray[index];
+            int index = aRand.nextInt(3); // 0 1 2
+            Bag b = bagArray[index]; // black bags
             //Chooses a random Pebble from selected bag
             Random bRand = new Random();
             int pebbleIndex = bRand.nextInt(b.getContentLength());
@@ -96,20 +138,24 @@ public class PebbleGame {
 
             } else {
                 Random hRand = new Random();
-                int hIndex = hRand.nextInt();
+                int hIndex = hRand.nextInt(hand.size());
+                System.out.println(this.playerName + "Has discarded " + hand.get(hIndex));
 
-                    if (hand.get(hIndex).getDrawBag().equals("A")) {
-                        bagArray[0].getContents().add(hand.remove(hIndex));
+                if (hand.get(hIndex).getDrawBag().equals("A")) {
+                    bagArray[0].getContents().add(hand.remove(hIndex));
 
-                    } else if (hand.get(hIndex).getDrawBag().equals("B")) {
-                        bagArray[1].getContents().add(hand.remove(hIndex));
 
-                    } else if (hand.get(hIndex).getDrawBag().equals("C")) {
-                        bagArray[3].getContents().add(hand.remove(hIndex));
-                    }
+                } else if (hand.get(hIndex).getDrawBag().equals("B")) {
+                    bagArray[1].getContents().add(hand.remove(hIndex));
+
+                } else if (hand.get(hIndex).getDrawBag().equals("C")) {
+                    bagArray[2].getContents().add(hand.remove(hIndex));
                 }
-            } catch (RuntimeException e) {
             }
+
+
+            System.out.println(this.playerName + "current hand is" + this.hand);
+
         }
 
         public synchronized void checkHand() {
@@ -117,8 +163,9 @@ public class PebbleGame {
             for (int i = 0; i < getHandSize(); i++) {
                 sum += hand.get(i).getValue();
                 if (sum == 100) {
-                    //All other players are flagged that a player has won
-                    // any other game ending features are run after the players are notified
+                    won = true;
+                    winner = true;
+                    notifyAll();
                 }
             }
         }
@@ -141,12 +188,15 @@ public class PebbleGame {
             return handSize;
         }
 
+
         @Override
         public void run() {
+            initialHand(blackBags);
             while (true) {
-                draw(blackBags);
                 deposit(whiteBags);
+                draw(blackBags);
             }
         }
     }
 }
+
