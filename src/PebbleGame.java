@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class PebbleGame {
     private static final Bag[] whiteBags = {new Bag("X"), new Bag("Y"), new Bag("Z")};
     private static Bag[] blackBags = {new Bag("A"), new Bag("B"), new Bag("C")};
-    public boolean winner = false;
+    public static boolean winner = false;
 
     public static void generateBags(Bag[] blackBags, int playerNo) {
         for (int i = 0; i < 3; i++) {
@@ -85,13 +85,12 @@ public class PebbleGame {
         Thread umpire = new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!winner) {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+
             }
         });
         umpire.start();
@@ -139,7 +138,7 @@ public class PebbleGame {
             } else {
                 Random hRand = new Random();
                 int hIndex = hRand.nextInt(hand.size());
-                System.out.println(this.playerName + "Has discarded " + hand.get(hIndex));
+                //System.out.println(this.playerName + "Has discarded " + hand.get(hIndex));
 
                 if (hand.get(hIndex).getDrawBag().equals("A")) {
                     bagArray[0].getContents().add(hand.remove(hIndex));
@@ -154,7 +153,7 @@ public class PebbleGame {
             }
 
 
-            System.out.println(this.playerName + "current hand is" + this.hand);
+            //System.out.println(this.playerName + "current hand is" + this.hand);
 
         }
 
@@ -162,10 +161,11 @@ public class PebbleGame {
             int sum = 0;
             for (int i = 0; i < getHandSize(); i++) {
                 sum += hand.get(i).getValue();
+                System.out.println("The sum of " + this.playerName + " is " + sum);
                 if (sum == 100) {
                     won = true;
                     winner = true;
-                    notifyAll();
+                    PebbleGame.this.notifyAll();
                 }
             }
         }
