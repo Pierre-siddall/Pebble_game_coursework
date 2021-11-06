@@ -1,4 +1,6 @@
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -9,6 +11,7 @@ public class PebbleGame {
     public static boolean winner = false;
 
     public static void generateBags(Bag[] blackBags, int playerNo) {
+
         for (int i = 0; i < 3; i++) {
             String fileName = "";
             File f = new File(fileName);
@@ -19,19 +22,20 @@ public class PebbleGame {
                 if (fileInput.equals('E') || fileInput.equals('e')) {
                     System.exit(0);
                 } else {
-                    if (blackBags[i].readFile(fileName)) {
+                    if (!blackBags[i].readFile(fileName, playerNo)) {
+                        System.out.println("Invalid FILE");
+                    } else {
+                        System.out.println("Valid FIle");
                         break;
                     }
                 }
             }
         }
-
-        checkBagSize(blackBags, playerNo);
     }
 
-    public static void checkPlayerInput(int playerNo, ArrayList<Thread> p) {
+    public static void checkPlayerInput(ArrayList<Thread> p) {
+        int playerNo = -1;
         Scanner playerInput = new Scanner(System.in);
-
         // Check if user has inputted negative numbers
         while (playerNo <= 0) {
             System.out.println("Please enter the number of players ");
@@ -40,16 +44,6 @@ public class PebbleGame {
         for (int i = 0; i < playerNo; i++) {
             Thread player = new Thread(new PebbleGame().new Player("p" + i));
             p.add(player);
-        }
-    }
-
-    public static void checkBagSize(Bag[] blackBags, int playerNo) {
-        int total = 0;
-        for (Bag b : blackBags) {
-            total = b.getContentLength();
-            if (total < playerNo * 11) {
-                generateBags(blackBags, playerNo);
-            }
         }
     }
 
@@ -66,10 +60,12 @@ public class PebbleGame {
         pg.playGame();
     }
 
+    @Deprecated
     public Bag[] getBlackBags() {
         return blackBags;
     }
 
+    @Deprecated
     public void setBlackBags(Bag[] blackBags) {
         PebbleGame.blackBags = blackBags;
     }
@@ -77,23 +73,10 @@ public class PebbleGame {
     public void playGame() {
         ArrayList<Thread> p = new ArrayList<Thread>();
 
-        int playerNo = 0;
-
         showWelcomeMessage();
-        checkPlayerInput(playerNo, p);
-        generateBags(blackBags, playerNo);
-        Thread umpire = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        checkPlayerInput(p);
+        generateBags(blackBags, p.size());
 
-            }
-        });
-        umpire.start();
         for (int i = 0; i < p.size(); i++) {
             p.get(i).start();
         }
@@ -101,7 +84,6 @@ public class PebbleGame {
 
     public class Player implements Runnable {
         private final String playerName;
-        private final int handSize = 0;
         private final ArrayList<Pebble> hand = new ArrayList<Pebble>();
         public boolean won = false;
 
@@ -153,20 +135,16 @@ public class PebbleGame {
             }
 
 
-            //System.out.println(this.playerName + "current hand is" + this.hand);
+            System.out.println(this.playerName + " current hand is " + this.hand);
 
         }
 
         public synchronized void checkHand() {
+            System.out.println("Entered the check hand function");
             int sum = 0;
-            for (int i = 0; i < getHandSize(); i++) {
+            for (int i = 0; i < hand.size(); i++) {
                 sum += hand.get(i).getValue();
-                System.out.println("The sum of " + this.playerName + " is " + sum);
-                if (sum == 100) {
-                    won = true;
-                    winner = true;
-                    PebbleGame.this.notifyAll();
-                }
+
             }
         }
 
@@ -184,10 +162,17 @@ public class PebbleGame {
             }
         }
 
-        public int getHandSize() {
-            return handSize;
+        // TODO - Write to file
+        public void writeToFile(String filename, String lineToWrite) {
+            try {
+                FileWriter writer = new FileWriter(filename);
+                writer.write(lineToWrite);
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("A file IO error occurred");
+                e.printStackTrace();
+            }
         }
-
 
         @Override
         public void run() {

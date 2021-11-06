@@ -5,8 +5,7 @@ import java.util.Scanner;
 public class Bag {
 
     private final String title;
-    private ArrayList<Pebble> contents = new ArrayList<Pebble>();
-    private States bagState;
+    private ArrayList<Pebble> contents = new ArrayList<>();
 
     public String getTitle() {
         return title;
@@ -25,23 +24,23 @@ public class Bag {
         this.contents = contents;
     }
 
-    public States getBagState() {
-        return bagState;
-    }
-
-    public void setBagState(States bagState) {
-        this.bagState = bagState;
-    }
-
-    public Boolean readFile(String filename) {
+    public boolean readFile(String filename, int playerNo) {
+        ArrayList<Pebble> temporaryArray = new ArrayList<Pebble>();
         try {
             Scanner reader = new Scanner(new File(filename));
             reader.useDelimiter(",");
             while (reader.hasNext()) {
-                contents.add(new Pebble(Integer.parseInt(reader.next().trim()), getTitle()));
+                temporaryArray.add(new Pebble(Integer.parseInt(reader.next().trim()), getTitle()));
             }
             reader.close();
-            return true;
+
+            System.out.println(playerNo * 11);
+
+            if (temporaryArray.size() > playerNo * 11) {
+                System.out.println("I run correctly");
+                this.contents = temporaryArray;
+                return true;
+            }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -59,7 +58,6 @@ public class Bag {
         return "Bag{" +
                 "title='" + title + '\'' +
                 ", contents=" + contents +
-                ", bagState=" + bagState +
                 '}';
     }
 

@@ -1,6 +1,7 @@
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class BagTest {
 
@@ -15,15 +16,6 @@ public class BagTest {
 
     }
 
-    @Test
-    public void getBagState() {
-        Bag b = new Bag("T3");
-        Bag b2 = new Bag("T4");
-        b.setBagState(Bag.States.EMPTY);
-        b2.setBagState(Bag.States.FULL);
-        assertEquals(Bag.States.EMPTY, b.getBagState());
-        assertEquals(Bag.States.FULL, b2.getBagState());
-    }
 
     @Test
     public void setBagState() {
