@@ -15,7 +15,6 @@ public class Bag {
         return contents.size();
     }
 
-    // This is a method lol
     public ArrayList<Pebble> getContents() {
         return contents;
     }
@@ -30,21 +29,22 @@ public class Bag {
             Scanner reader = new Scanner(new File(filename));
             reader.useDelimiter(",");
             while (reader.hasNext()) {
-                temporaryArray.add(new Pebble(Integer.parseInt(reader.next().trim()), getTitle()));
+                int pebble = Integer.parseInt(reader.next().trim());
+                if (pebble >= 0) {
+                    temporaryArray.add(new Pebble(pebble, getTitle()));
+                } else {
+                    System.out.println("You tried to read a file containing negative integers");
+                    return false;
+                }
             }
             reader.close();
 
-            System.out.println(playerNo * 11);
-
             if (temporaryArray.size() > playerNo * 11) {
-                System.out.println("I run correctly");
                 this.contents = temporaryArray;
                 return true;
             }
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-
         }
         return false;
     }

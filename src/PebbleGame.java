@@ -7,8 +7,8 @@ import java.util.Scanner;
 
 public class PebbleGame {
     private static final Bag[] whiteBags = {new Bag("X"), new Bag("Y"), new Bag("Z")};
-    private static Bag[] blackBags = {new Bag("A"), new Bag("B"), new Bag("C")};
-    public static boolean winner = false;
+    private static final Bag[] blackBags = {new Bag("A"), new Bag("B"), new Bag("C")};
+    private static boolean won;
 
     public static void generateBags(Bag[] blackBags, int playerNo) {
 
@@ -19,13 +19,11 @@ public class PebbleGame {
                 Scanner fileInput = new Scanner(System.in);
                 System.out.println("Please enter the location of Bag number " + i + " to load:");
                 fileName = fileInput.nextLine(); //Read in the users input
-                if (fileInput.equals('E') || fileInput.equals('e')) {
+                if (fileName.equals("E") || fileName.equals("e")) {
                     System.exit(0);
                 } else {
                     if (!blackBags[i].readFile(fileName, playerNo)) {
-                        System.out.println("Invalid FILE");
                     } else {
-                        System.out.println("Valid FIle");
                         break;
                     }
                 }
@@ -39,7 +37,12 @@ public class PebbleGame {
         // Check if user has inputted negative numbers
         while (playerNo <= 0) {
             System.out.println("Please enter the number of players ");
-            playerNo = playerInput.nextInt();
+            String playerString = playerInput.nextLine();
+            if (playerString.equals("E") || playerString.equals("e")) {
+                System.exit(0);
+            }
+            playerNo = Integer.parseInt(playerString);
+
         }
         for (int i = 0; i < playerNo; i++) {
             Thread player = new Thread(new PebbleGame().new Player("p" + i));
@@ -60,18 +63,8 @@ public class PebbleGame {
         pg.playGame();
     }
 
-    @Deprecated
-    public Bag[] getBlackBags() {
-        return blackBags;
-    }
-
-    @Deprecated
-    public void setBlackBags(Bag[] blackBags) {
-        PebbleGame.blackBags = blackBags;
-    }
-
     public void playGame() {
-        ArrayList<Thread> p = new ArrayList<Thread>();
+        ArrayList<Thread> p = new ArrayList<>();
 
         showWelcomeMessage();
         checkPlayerInput(p);
@@ -82,17 +75,38 @@ public class PebbleGame {
         }
     }
 
+
     public class Player implements Runnable {
+
+        private final String logName;
         private final String playerName;
         private final ArrayList<Pebble> hand = new ArrayList<Pebble>();
         public boolean won = false;
 
         public Player(String playerName) {
             this.playerName = playerName;
+            this.logName = playerName + "_output.txt";
+
+
         }
 
-        public String getPlayerName() {
-            return playerName;
+        public void writeToFile(String fileName, String lineToWrite) {
+            try {
+                File file = new File(this.logName);
+                FileWriter writer = new FileWriter(file, true);
+                writer.write(lineToWrite);
+                writer.close();
+            } catch (IOException e) {
+                System.out.println("A file IO error occurred");
+            }
+        }
+
+        public String handString() {
+            String hand = "";
+            for (Pebble p : this.hand) {
+                hand += p.getValue() + ",";
+            }
+            return hand;
         }
 
         public synchronized void initialHand(Bag[] bagArray) {
@@ -112,6 +126,9 @@ public class PebbleGame {
             checkEmptyBag(b, whiteBags);
             hand.add(b.getContents().get(pebbleIndex));
             checkHand();
+
+            writeToFile(this.logName, this.playerName + " has drawn a " + b.getContents().get(pebbleIndex).getValue() + " from bag " + b.getTitle() + "\n");
+            writeToFile(this.logName, this.playerName + " current hand is " + handString() + "\n");
         }
 
         public synchronized void deposit(Bag[] bagArray) throws RuntimeException {
@@ -120,7 +137,7 @@ public class PebbleGame {
             } else {
                 Random hRand = new Random();
                 int hIndex = hRand.nextInt(hand.size());
-                //System.out.println(this.playerName + "Has discarded " + hand.get(hIndex));
+                writeToFile(this.logName, this.playerName + " has discarded " + hand.get(hIndex).getValue() + "\n");
 
                 if (hand.get(hIndex).getDrawBag().equals("A")) {
                     bagArray[0].getContents().add(hand.remove(hIndex));
@@ -134,17 +151,18 @@ public class PebbleGame {
                 }
             }
 
-
-            System.out.println(this.playerName + " current hand is " + this.hand);
+            writeToFile(this.logName, this.playerName + " current hand is " + handString() + "\n");
 
         }
 
         public synchronized void checkHand() {
-            System.out.println("Entered the check hand function");
             int sum = 0;
             for (int i = 0; i < hand.size(); i++) {
                 sum += hand.get(i).getValue();
 
+            }
+            if (sum == 100) {
+                PebbleGame.won = true;
             }
         }
 
@@ -158,30 +176,19 @@ public class PebbleGame {
                     bag.setContents(bagArray[2].getContents());
                 }
             } catch (RuntimeException e) {
-                e.printStackTrace();
             }
         }
 
-        // TODO - Write to file
-        public void writeToFile(String filename, String lineToWrite) {
-            try {
-                FileWriter writer = new FileWriter(filename);
-                writer.write(lineToWrite);
-                writer.close();
-            } catch (IOException e) {
-                System.out.println("A file IO error occurred");
-                e.printStackTrace();
-            }
-        }
 
         @Override
         public void run() {
             initialHand(blackBags);
-            while (true) {
+            while (!PebbleGame.won) {
                 deposit(whiteBags);
                 draw(blackBags);
             }
         }
     }
+
 }
 
